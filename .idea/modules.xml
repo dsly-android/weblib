@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/YCWebView.iml" filepath="$PROJECT_DIR$/.idea/modules/YCWebView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/YCWebView.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/YCWebView.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WebViewLib/YCWebView.weblib.iml" filepath="$PROJECT_DIR$/.idea/modules/WebViewLib/YCWebView.weblib.iml" />
+    </modules>
+  </component>
+</project>
