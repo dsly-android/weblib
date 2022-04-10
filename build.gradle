@@ -19,6 +19,8 @@ allprojects {
         //x5
         mavenCentral()
     }
+    //使weblib不执行javadoc命令
+    tasks.getByPath(":weblib:javadoc").enabled = false
 }
 
 task clean(type: Delete) {

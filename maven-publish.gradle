@@ -9,8 +9,8 @@ if (project.hasProperty("android")) { // Android libraries
         excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-        options.encoding = "utf-8"
-        options.charSet = "utf-8"
+        options.encoding = "UTF-8"
+        options.charSet = "UTF-8"
     }
 } else { // Java libraries
     task sourcesJar(type: Jar, dependsOn: classes) {
