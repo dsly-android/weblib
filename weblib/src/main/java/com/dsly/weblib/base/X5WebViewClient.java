@@ -21,11 +21,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.dsly.weblib.cache.WebViewCacheDelegate;
 import com.dsly.weblib.helper.WebSchemeIntent;
 import com.dsly.weblib.inter.InterWebListener;
 import com.dsly.weblib.utils.EncodeUtils;
 import com.dsly.weblib.utils.X5LogUtils;
 import com.dsly.weblib.utils.X5WebUtils;
+import com.dsly.weblib.view.BaseWebView;
 import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
@@ -49,7 +51,7 @@ import com.tencent.smtt.sdk.WebViewClient;
 public class X5WebViewClient extends WebViewClient {
 
     private InterWebListener webListener;
-    private WebView webView;
+    private BaseWebView webView;
     private Context context;
     /**
      * 是否加载完毕
@@ -65,6 +67,7 @@ public class X5WebViewClient extends WebViewClient {
      * 避免由于刷新造成循环重定向.
      */
     private static final long DEFAULT_REDIRECT_INTERVAL = 3000;
+
     /**
      * 获取是否加载完毕
      *
@@ -89,7 +92,7 @@ public class X5WebViewClient extends WebViewClient {
      * @param webView 需要传进来webview
      * @param context 上下文
      */
-    public X5WebViewClient(WebView webView, Context context) {
+    public X5WebViewClient(BaseWebView webView, Context context) {
         this.context = context;
         this.webView = webView;
     }
@@ -470,9 +473,11 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, String s) {
-        WebResourceResponse webResourceResponse = super.shouldInterceptRequest(webView, s);
-        return webResourceResponse;
-        //return super.shouldInterceptRequest(webView, s);
+        if (X5WebUtils.isUseCustomCache()) {
+            return WebViewCacheDelegate.getInstance().interceptRequest(s);
+        } else {
+            return super.shouldInterceptRequest(webView, s);
+        }
     }
 
     /**
@@ -488,8 +493,10 @@ public class X5WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
-        WebResourceResponse webResourceResponse = super.shouldInterceptRequest(webView, webResourceRequest);
-        return webResourceResponse;
-        //return super.shouldInterceptRequest(webView, webResourceRequest);
+        if (X5WebUtils.isUseCustomCache()) {
+            return WebViewCacheDelegate.getInstance().interceptRequest(webResourceRequest);
+        } else {
+            return super.shouldInterceptRequest(webView, webResourceRequest);
+        }
     }
 }

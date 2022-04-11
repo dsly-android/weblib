@@ -53,7 +53,6 @@ public class X5WebView extends BaseWebView {
     private X5WebViewClient x5WebViewClient;
     private X5WebChromeClient x5WebChromeClient;
     private volatile boolean mInitialized;
-    public static boolean isLongClick = true;
 
     @Override
     protected void onDetachedFromWindow() {
@@ -220,7 +219,7 @@ public class X5WebView extends BaseWebView {
     }
 
     private void initListener() {
-        if (isLongClick) {
+        if (X5WebUtils.isLongClick()) {
             this.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {

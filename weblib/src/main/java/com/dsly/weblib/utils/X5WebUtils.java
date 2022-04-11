@@ -66,6 +66,16 @@ public final class X5WebUtils {
     private static Application application;
 
     /**
+     * 是否可以长按下载图片
+     */
+    private static boolean mIsLongClick = true;
+
+    /**
+     * 是否使用缓存
+     */
+    private static boolean mUseCustomCache = false;
+
+    /**
      * 不能直接new，否则抛个异常
      */
     private X5WebUtils() throws WebViewException {
@@ -77,7 +87,7 @@ public final class X5WebUtils {
      *
      * @param context 上下文
      */
-    public static void init(final Context context) {
+    public static void init(final Context context,boolean isLongClick,boolean useCustomCache) {
         if (context instanceof Application) {
             application = (Application) context;
             //初始化X5内核,通过服务去加载,避免ANR
@@ -104,7 +114,8 @@ public final class X5WebUtils {
             };
             //x5内核初始化接口
             QbSdk.initX5Environment(context, cb);
-            X5WebView.isLongClick = true;
+            mIsLongClick = isLongClick;
+            mUseCustomCache = useCustomCache;
         } else {
             throw new UnsupportedOperationException("context must be application...");
         }
@@ -145,6 +156,14 @@ public final class X5WebUtils {
      */
     public static Application getApplication() {
         return application;
+    }
+
+    public static boolean isLongClick() {
+        return mIsLongClick;
+    }
+
+    public static boolean isUseCustomCache() {
+        return mUseCustomCache;
     }
 
     /**
