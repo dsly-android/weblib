@@ -163,7 +163,7 @@
             android:padding="10dp"
             android:textSize="12sp"
             android:background="@color/colorAccent"
-            android:text="12.监听web网页中下载的进度操作，待完善"/>
+            android:text="12.监听web网页中下载的进度操作"/>
 
         <TextView
             android:id="@+id/tv_13"

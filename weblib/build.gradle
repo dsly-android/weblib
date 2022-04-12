@@ -35,5 +35,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     //x5
     api files('libs\\tbs_sdk_thirdapp_v4.3.0.276_44176_sharewithdownloadwithfile_withoutGame_obfs_20220329_155659.jar')
+    //Downloader
+    implementation 'com.github.Justson:Downloader:v5.0.0'
 }
 apply from: '../maven-publish.gradle'

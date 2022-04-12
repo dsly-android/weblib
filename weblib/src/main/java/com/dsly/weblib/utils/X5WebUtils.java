@@ -21,18 +21,32 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.AppOpsManagerCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v4.os.EnvironmentCompat;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.webkit.WebView;
 
+import com.dsly.weblib.R;
 import com.dsly.weblib.cache.WebViewCacheDelegate;
 import com.dsly.weblib.cache.WebViewCacheWrapper;
+import com.dsly.weblib.download.AbsAgentWebUIController;
 import com.dsly.weblib.tools.WebViewException;
 import com.dsly.weblib.view.X5WebView;
 import com.tencent.smtt.export.external.TbsCoreSettings;
@@ -44,10 +58,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * <pre>
@@ -356,4 +377,171 @@ public final class X5WebUtils {
         }
         return tag;
     }
+
+    public static boolean isEmptyCollection(Collection collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    public static File createImageFile(Context context) {
+        File mFile = null;
+        try {
+            String timeStamp =
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+            String imageName = String.format("aw_%s.jpg", timeStamp);
+            mFile = createFileByName(context, imageName, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return mFile;
+    }
+
+    public static File createFileByName(Context context, String name, boolean cover) throws IOException {
+        String path = getAgentWebFilePath(context);
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+        File mFile = new File(path, name);
+        if (mFile.exists()) {
+            if (cover) {
+                mFile.delete();
+                mFile.createNewFile();
+            }
+        } else {
+            mFile.createNewFile();
+        }
+        return mFile;
+    }
+
+    public static String getAgentWebFilePath(Context context) {
+        if (!TextUtils.isEmpty(WebkitCookieUtils.AGENTWEB_FILE_PATH)) {
+            return WebkitCookieUtils.AGENTWEB_FILE_PATH;
+        }
+        String dir = getDiskExternalCacheDir(context);
+        File mFile = new File(dir, WebkitCookieUtils.FILE_CACHE_PATH);
+        try {
+            if (!mFile.exists()) {
+                mFile.mkdirs();
+            }
+        } catch (Throwable throwable) {
+            X5LogUtils.i("create dir exception");
+        }
+        X5LogUtils.i("path:" + mFile.getAbsolutePath() + "  path:" + mFile.getPath());
+        return WebkitCookieUtils.AGENTWEB_FILE_PATH = mFile.getAbsolutePath();
+    }
+
+    static String getDiskExternalCacheDir(Context context) {
+        File mFile = context.getExternalCacheDir();
+        if (Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(mFile))) {
+            return mFile.getAbsolutePath();
+        }
+        return null;
+    }
+
+    public static Intent getIntentCaptureCompat(Context context, File file) {
+        Intent mIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Uri mUri = getUriFromFile(context, file);
+        mIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        mIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+        return mIntent;
+    }
+
+    public static Intent getIntentVideoCompat(Context context, File file){
+        Intent mIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        Uri mUri = getUriFromFile(context, file);
+        mIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        mIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+        return mIntent;
+    }
+
+    public static Uri getUriFromFile(Context context, File file) {
+        Uri uri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = getUriFromFileForN(context, file);
+        } else {
+            uri = Uri.fromFile(file);
+        }
+        return uri;
+    }
+
+    static Uri getUriFromFileForN(Context context, File file) {
+        Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".AgentWebFileProvider", file);
+        return fileUri;
+    }
+
+    public static File createVideoFile(Context context){
+        File mFile = null;
+        try {
+            String timeStamp =
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+            String imageName = String.format("aw_%s.mp4", timeStamp);  //默认生成mp4
+            mFile = createFileByName(context, imageName, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return mFile;
+    }
+
+    public static boolean hasPermission(@NonNull Context context, @NonNull String... permissions) {
+        return hasPermission(context, Arrays.asList(permissions));
+    }
+
+    public static boolean hasPermission(@NonNull Context context, @NonNull List<String> permissions) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        for (String permission : permissions) {
+            int result = ContextCompat.checkSelfPermission(context, permission);
+            if (result == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+            String op = AppOpsManagerCompat.permissionToOp(permission);
+            if (TextUtils.isEmpty(op)) {
+                continue;
+            }
+            result = AppOpsManagerCompat.noteProxyOp(context, op, context.getPackageName());
+            if (result != AppOpsManagerCompat.MODE_ALLOWED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int checkNetworkType(Context context) {
+        int netType = 0;
+        //连接管理对象
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        //获取NetworkInfo对象
+        @SuppressLint("MissingPermission") NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo == null) {
+            return netType;
+        }
+        switch (networkInfo.getType()) {
+            case ConnectivityManager.TYPE_WIFI:
+            case ConnectivityManager.TYPE_WIMAX:
+            case ConnectivityManager.TYPE_ETHERNET:
+                return 1;
+            case ConnectivityManager.TYPE_MOBILE:
+                switch (networkInfo.getSubtype()) {
+                    case TelephonyManager.NETWORK_TYPE_LTE:  // 4G
+                    case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    case TelephonyManager.NETWORK_TYPE_EHRPD:
+                        return 2;
+                    case TelephonyManager.NETWORK_TYPE_UMTS: // 3G
+                    case TelephonyManager.NETWORK_TYPE_CDMA:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                        return 3;
+                    case TelephonyManager.NETWORK_TYPE_GPRS: // 2G
+                    case TelephonyManager.NETWORK_TYPE_EDGE:
+                        return 4;
+                    default:
+                        return netType;
+                }
+
+            default:
+                return netType;
+        }
+    }
+
 }

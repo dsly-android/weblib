@@ -14,36 +14,40 @@ import android.util.Log;
 public final class X5LogUtils {
 
     private static final String TAG = "X5LogUtils";
-    private static boolean isLog = true;
+    private static boolean isDebug = true;
 
     /**
      * 设置是否开启日志
-     * @param isLog                 是否开启日志
+     * @param isDebug                 是否开启日志
      */
-    public static void setIsLog(boolean isLog) {
-        X5LogUtils.isLog = isLog;
+    public static void setIsDebug(boolean isDebug) {
+        X5LogUtils.isDebug = isDebug;
+    }
+
+    public static boolean isDebug() {
+        return isDebug;
     }
 
     public static void d(String message) {
-        if(isLog){
+        if(isDebug){
             Log.d(TAG, message);
         }
     }
 
     public static void i(String message) {
-        if(isLog){
+        if(isDebug){
             Log.i(TAG, message);
         }
     }
 
     public static void e(String message) {
-        if(isLog){
+        if(isDebug){
             Log.e(TAG, message);
         }
     }
 
     public static void e(String message, Throwable throwable) {
-        if(isLog){
+        if(isDebug){
             Log.e(TAG, message, throwable);
         }
     }

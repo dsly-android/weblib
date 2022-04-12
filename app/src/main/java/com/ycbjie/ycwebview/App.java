@@ -10,7 +10,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        X5LogUtils.setIsLog(BuildConfig.DEBUG);
+        X5LogUtils.setIsDebug(BuildConfig.DEBUG);
         X5WebUtils.init(this,true,false);
         X5WebUtils.initCache(this,null);
     }

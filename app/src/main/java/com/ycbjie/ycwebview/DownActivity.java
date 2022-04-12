@@ -27,7 +27,6 @@ public class DownActivity extends AppCompatActivity {
 
     private X5WebView mWebView;
     private WebProgress progress;
-    private String url;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -81,10 +80,7 @@ public class DownActivity extends AppCompatActivity {
 
 
     public void initData() {
-        Intent intent = getIntent();
-        if (intent!=null){
-            url = intent.getStringExtra("url");
-        }
+
     }
 
     public void initView() {
@@ -96,14 +92,7 @@ public class DownActivity extends AppCompatActivity {
         mWebView.loadUrl("http://sj.qq.com/myapp/");
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
-        mWebView.setDownloadListener(new DownloadListener() {
-            @Override
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
-
-            }
-        });
     }
-
 
     private DefaultWebListener interWebListener = new DefaultWebListener() {
         @Override

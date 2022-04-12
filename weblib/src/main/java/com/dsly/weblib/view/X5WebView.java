@@ -17,13 +17,16 @@ package com.dsly.weblib.view;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.dsly.weblib.base.X5WebChromeClient;
+import com.dsly.weblib.download.DefaultDownloadImpl;
 import com.dsly.weblib.tools.WebViewException;
+import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebHistoryItem;
@@ -238,6 +241,7 @@ public class X5WebView extends BaseWebView {
                 }
             });
         }
+        setDownloadListener(DefaultDownloadImpl.create((AppCompatActivity) getContext()));
     }
 
     /**

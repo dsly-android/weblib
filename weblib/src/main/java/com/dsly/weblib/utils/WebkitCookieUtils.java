@@ -6,6 +6,7 @@ import android.os.Build;
 import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.CookieSyncManager;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -18,6 +19,13 @@ import java.util.ArrayList;
  * </pre>
  */
 public final class WebkitCookieUtils {
+
+    static final String FILE_CACHE_PATH = "agentweb-cache";
+    static final String AGENTWEB_CACHE_PATCH = File.separator + "agentweb-cache";
+    /**
+     * 缓存路径
+     */
+    static String AGENTWEB_FILE_PATH;
 
     /**
      * 同步cookie
@@ -57,14 +65,16 @@ public final class WebkitCookieUtils {
     /**
      * 获取url的cookie操作
      *
-     * @param url     url
+     * @param url url
      * @return
      */
     public static String getCookie(String url) {
         CookieManager cookieManager = CookieManager.getInstance();
-        String cookieStr = cookieManager.getCookie(url);
-        X5LogUtils.i("WebkitCookieUtils----Cookies = " + cookieStr);
-        return cookieStr;
+        if (cookieManager == null) {
+            return null;
+        } else {
+            return cookieManager.getCookie(url);
+        }
     }
 
 
@@ -118,5 +128,4 @@ public final class WebkitCookieUtils {
             CookieSyncManager.getInstance().sync();
         }
     }
-
 }

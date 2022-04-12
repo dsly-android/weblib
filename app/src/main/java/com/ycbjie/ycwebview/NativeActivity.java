@@ -92,11 +92,11 @@ public class NativeActivity extends AppCompatActivity implements View.OnClickLis
         progress.show();
         progress.setColor(this.getResources().getColor(R.color.colorAccent));
 
-        mWebView.loadUrl("file:///android_asset/js_interaction/hello.html");
         mWebView.getX5WebChromeClient().setWebListener(interWebListener);
         mWebView.getX5WebViewClient().setWebListener(interWebListener);
-
         mWebView.setInitialScale(250);
+
+        mWebView.loadUrl("file:///android_asset/js_interaction/hello.html");
     }
 
     private DefaultWebListener interWebListener = new DefaultWebListener() {
