@@ -1,3 +1,5 @@
+implementation 'io.github.dsly-android:weblib:0.0.1'
+
 #### 目录介绍
 - 01.该库具有的功能
 - 02.该库如何使用
